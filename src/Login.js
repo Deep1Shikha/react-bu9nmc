@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 export default function Login() {
@@ -7,11 +7,11 @@ export default function Login() {
   const [rememberMe, setRem] = useState(true);
   const history = useHistory();
 
-  // useEffect(() => {
-  //   if (localStorage.getItem('user-info')) {
-  //     history.push('/add');
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      history.push('/dashboard');
+    }
+  }, []);
   async function login() {
     console.warn(email, password, rememberMe);
     let credentials = { email, password, rememberMe };
@@ -23,8 +23,10 @@ export default function Login() {
       body: JSON.stringify(credentials),
     });
     result = await result.json();
-    localStorage.setItem('user-info', JSON.stringify(result));
-    // history.push('add');
+    if (result.statusCode === '200') {
+      localStorage.setItem('token', JSON.stringify(result.token));
+      history.push('dashboard');
+    }
   }
 
   return (
